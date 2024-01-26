@@ -9,18 +9,19 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var inputStreamNative: InputStreamNative
+    private lateinit var fileReader: FileReader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        inputStreamNative = InputStreamNative()
+        fileReader = FileReader()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val inputStream: InputStream = assets.open("example.txt")
 
-        binding.sampleText.text = inputStreamNative.read(inputStream)
+        var arr: ByteArray = ByteArray(2000)
+        binding.sampleText.text = fileReader.read(inputStream, arr)
     }
 
     companion object {
