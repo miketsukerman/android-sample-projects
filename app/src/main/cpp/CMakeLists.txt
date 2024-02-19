@@ -5,7 +5,8 @@ project("myapplication")
 add_library(${CMAKE_PROJECT_NAME} SHARED
         # List C/C++ source files with relative paths to this CMakeLists.txt.
         native-lib.cpp
-        InputStreamAdapter.cpp)
+        InputStreamAdapter.cpp
+        InputStream.h)
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
         # List libraries link to the target library

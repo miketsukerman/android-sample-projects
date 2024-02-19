@@ -1,6 +1,6 @@
 #include "InputStreamAdapter.h"
 
-std::shared_ptr<JavaInputStreamAdaptor> CreateJavaInputStreamAdaptor(JNIEnv* env, jobject stream, jbyteArray mem) {
+InputStreamPtr InputStreamAdaptorFactory::CreateJavaInputStreamAdaptor(JNIEnv* env, jobject stream) {
     static bool gInited;
     if (!gInited) {
         jclass inputStream_Clazz = env->FindClass("java/io/InputStream");
@@ -22,5 +22,5 @@ std::shared_ptr<JavaInputStreamAdaptor> CreateJavaInputStreamAdaptor(JNIEnv* env
         RETURN_NULL_IF_NULL(gInputStream_skipMethodID);
         gInited = true;
     }
-    return std::make_shared<JavaInputStreamAdaptor>(env, stream, mem);
+    return std::make_shared<InputStreamAdaptor>(env, stream);
 }

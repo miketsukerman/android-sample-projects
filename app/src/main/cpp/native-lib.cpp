@@ -10,14 +10,14 @@
 extern "C" JNIEXPORT jstring
 
 JNICALL
-Java_com_example_myapplication_FileReader_read(JNIEnv *env, jobject, jobject input_stream, jbyteArray mem)
+Java_com_example_myapplication_FileReader_read(JNIEnv *env, jobject, jobject input_stream)
 {
     std::string hello;
     hello.resize(1024);
 
-    auto inputStreamAdapter = CreateJavaInputStreamAdaptor(env, input_stream, mem);
+    auto inputStream = InputStreamAdaptorFactory::CreateJavaInputStreamAdaptor(env, input_stream);
 
-    inputStreamAdapter->read(hello.data(),hello.size());
+    inputStream->read(hello.data(),hello.size());
 
     return env->NewStringUTF(hello.c_str());
 }

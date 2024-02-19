@@ -20,8 +20,7 @@ class MainActivity : AppCompatActivity() {
 
         val inputStream: InputStream = assets.open("example.txt")
 
-        var arr: ByteArray = ByteArray(2000)
-        binding.sampleText.text = fileReader.read(inputStream, arr)
+        binding.sampleText.text = fileReader.read(inputStream)
     }
 
     companion object {

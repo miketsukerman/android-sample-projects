@@ -5,6 +5,8 @@
 #include <cassert>
 #include <memory>
 
+#include "InputStream.h"
+
 #define RETURN_NULL_IF_NULL(value) \
     do { if (!(value)) { assert(0); return NULL; } } while (false)
 
@@ -14,18 +16,19 @@ static jmethodID    gInputStream_markSupportedMethodID;
 static jmethodID    gInputStream_readMethodID;
 static jmethodID    gInputStream_skipMethodID;
 
-class JavaInputStreamAdaptor {
+class InputStreamAdaptor : public InputStream {
 public:
-    JavaInputStreamAdaptor(JNIEnv* env, jobject js, jbyteArray ar)
-            : fEnv(env), fJavaInputStream(js), fJavaByteArray(ar) {
-        assert(ar);
-        fCapacity = env->GetArrayLength(ar);
+    InputStreamAdaptor(JNIEnv* env, jobject js)
+            : fEnv(env), fJavaInputStream(js) {
+
+        fJavaByteArray= env->NewByteArray(2000);
+        fCapacity = env->GetArrayLength(fJavaByteArray);
         assert(fCapacity > 0);
         fBytesRead = 0;
         fIsAtEnd = false;
     }
 
-    virtual size_t read(void* buffer, size_t size) {
+    virtual std::streamsize read(char* buffer, std::streamsize size) override {
         JNIEnv* env = fEnv;
         if (NULL == buffer) {
             if (0 == size) {
@@ -57,8 +60,24 @@ public:
     virtual bool isAtEnd() const {
         return fIsAtEnd;
     }
+
+    virtual bool isBufferBased() const override
+    {
+        return false;
+    }
+
+    virtual bool isSeekable() const override
+    {
+        return false;
+    }
+
+    virtual std::streamoff seek(std::streamoff offset) override
+    {
+        return 0;
+    }
+
 private:
-    // Does not override rewind, since a JavaInputStreamAdaptor's interface
+    // Does not override rewind, since a InputStreamAdaptor's interface
     // does not support rewinding. RewindableJavaStream, which is a friend,
     // will be able to call this method to rewind.
     bool doRewind() {
@@ -126,10 +145,12 @@ private:
     size_t      fCapacity;
     size_t      fBytesRead;
     bool        fIsAtEnd;
-    // Allows access to doRewind and fBytesRead.
-    friend class RewindableJavaStream;
 };
 
-std::shared_ptr<JavaInputStreamAdaptor> CreateJavaInputStreamAdaptor(JNIEnv* env, jobject stream, jbyteArray mem);
+class InputStreamAdaptorFactory
+{
+public:
+    static InputStreamPtr CreateJavaInputStreamAdaptor(JNIEnv* env, jobject stream);
+};
 
 #endif //MY_APPLICATION_INPUTSTREAMADAPTER_H
